@@ -25,6 +25,8 @@ return new Promise(function (resolve, reject) {
 });
 }
 
+showVal = 4
+
 function speak(text, lang) {
   checkSupport()
   setSpeech().then((voices) => {
@@ -59,7 +61,7 @@ function getLang(myString) {
 function showResults() {
   results = []
     $('#results').empty('')
-    const value = $('#search').val();
+    const value = $('#search').val().toLowerCase();
     if( searches.length + 1 > 20 ) {
       searches.pop()
     }
@@ -73,14 +75,14 @@ function showResults() {
     json.forEach(j => {
       if (containsWord(j['w'], value)) {
         results.push(j)
-      } else if ( j['w'].includes(value)) {
+      } else if ( j['w'].toLowerCase().includes(value)) {
         results.push(j)
       }
     })
     results.sort(function(a,b){
       return a['w'].length - b['w'].length;
     });
-    results.forEach(function (r, i) {
+    results.slice( 0, showVal ).forEach(function (r, i) {
       var l_h3 = getLang(r['w']);
       if (l_h3 == 'it-IT') {
           var l_m = 'zh-CN'
@@ -96,7 +98,7 @@ function showResults() {
 }
 
 function containsWord(string, word) {
-  return new RegExp('\\b' + word + '\\b').test(string);
+  return new RegExp('\\b' + word.toLowerCase() + '\\b').test(string.toLowerCase());
 }
 
 const searches = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('DICT_RECENT_SEARCH') || "[]") : null
@@ -137,4 +139,22 @@ $(document).on('keypress',function(e) {
 });
 
 
+$('#show-more').on('click', function(){
+  showVal +=4
+  showResults()
+});
 
+$('#show-less').on('click', function(){
+  showVal -=4
+  showResults()
+});
+
+//Show only four items
+if ( $('.result').length > 4 ) {
+   /*$('.lia-list-standard li:gt(3)').hide();
+   $('.show-more').removeClass('hidden');
+   */
+       $('.show-less').click();
+}
+
+   
